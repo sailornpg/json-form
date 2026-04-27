@@ -1,0 +1,21 @@
+{
+  "name": "@json-form/renderer-antdv",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "@json-form/engine-adapter": "file:../engine-adapter",
+    "@jsonforms/core": "^3.6.0",
+    "@jsonforms/vue": "^3.6.0",
+    "ant-design-vue": "^4.2.6",
+    "vue": "^3.5.32"
+  }
+}
