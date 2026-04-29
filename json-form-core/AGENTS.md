@@ -22,7 +22,9 @@ Git history is not available in this workspace, so no repository-specific commit
 
 For pull requests, include a brief summary, the commands you ran to validate the change, and screenshots for UI updates. Link the related issue when one exists, and keep PRs scoped to a single concern.
 
-## Spec Writing Guidelines
+## Language & Spec Writing Guidelines
+When answering questions or writing documentation for this repository, use Chinese by default unless the user explicitly requests another language. Preserve English identifiers, package names, commands, schema keys, and other machine-readable values as written.
+
 When writing spec documents for this repository, write them in Chinese by default unless the user explicitly requests another language.
 
 ## Security & Configuration Tips
