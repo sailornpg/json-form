@@ -3,37 +3,64 @@ import {
   rankWith,
   type ControlElement,
   type JsonFormsRendererRegistryEntry,
-  type JsonSchema,
 } from '@jsonforms/core'
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
-import { Form, Input, InputNumber, Select, Switch, Typography } from 'ant-design-vue'
-import { defineComponent, h } from 'vue'
+import {
+  Checkbox,
+  DatePicker,
+  Form,
+  Input,
+  InputNumber,
+  Radio,
+  Select,
+  Switch,
+  TimePicker,
+  Typography,
+} from 'ant-design-vue'
+import { defineComponent, h, toRaw } from 'vue'
+
+import {
+  buildArrayEnumOptions,
+  buildEnumOptions,
+  getSchemaType,
+  getUiWidget,
+  isBuiltInControlKind,
+  resolveControlKind,
+  type BuiltInControlKind,
+  type PrimitiveSchema,
+  type SchemaFormFieldOption,
+} from './controlKinds'
+import {
+  dateFormat,
+  dateTimeFormat,
+  formatDateValue,
+  normalizeArrayValue,
+  normalizeBooleanValue,
+  normalizeNumberValue,
+  parseDateValue,
+  timeFormat,
+} from './controlValues'
+import { getSchemaFormWidgets, type SchemaFormWidgetMap } from './widgetRegistry'
 
 const FormItem = Form.Item
 const TextArea = Input.TextArea as any
+const Password = Input.Password as any
 const Text = Typography.Text as any
+const CheckboxComponent = Checkbox as any
+const CheckboxGroupComponent = Checkbox.Group as any
+const DatePickerComponent = DatePicker as any
 const InputComponent = Input as any
 const InputNumberComponent = InputNumber as any
+const RadioGroupComponent = Radio.Group as any
 const SelectComponent = Select as any
 const SwitchComponent = Switch as any
-
-type PrimitiveSchema = JsonSchema & {
-  enum?: unknown[]
-  format?: string
-  type?: string | string[]
-}
+const TimePickerComponent = TimePicker as any
 
 type SchemaFormValidationConfig = {
   displayMode?: 'touched' | 'submit' | 'always'
   submitted?: boolean
   touchedPaths?: string[]
   onFieldInput?: (path: string) => void
-}
-
-type SchemaFormFieldOption = {
-  label: string
-  value: unknown
-  disabled?: boolean
 }
 
 type SchemaFormFieldState = {
@@ -49,17 +76,21 @@ type SchemaFormFieldState = {
 
 type SchemaFormInternalConfig = {
   validation?: SchemaFormValidationConfig
+  widgetsId?: string
+  widgets?: SchemaFormWidgetMap
   fields?: Record<string, SchemaFormFieldState>
 }
 
-const getSchemaType = (schema: PrimitiveSchema) =>
-  Array.isArray(schema.type) ? schema.type[0] : schema.type
+const resolveWidgetProps = (options: unknown) => {
+  if (!options || typeof options !== 'object') {
+    return undefined
+  }
 
-const buildEnumOptions = (schema: PrimitiveSchema) =>
-  (schema.enum ?? []).map((value) => ({
-    label: String(value),
-    value,
-  }))
+  const widgetProps = (options as { widgetProps?: unknown }).widgetProps
+  return widgetProps && typeof widgetProps === 'object'
+    ? widgetProps as Record<string, unknown>
+    : undefined
+}
 
 const resolveSchemaFormConfig = (config: unknown): SchemaFormInternalConfig | undefined => {
   if (!config || typeof config !== 'object') {
@@ -93,6 +124,22 @@ const resolveFieldState = (
   path: string,
 ) => config?.fields?.[path]
 
+const resolveOptions = (
+  schema: PrimitiveSchema,
+  runtimeOptions: SchemaFormFieldOption[] | undefined,
+  kind: BuiltInControlKind | undefined,
+) => {
+  if (runtimeOptions !== undefined) {
+    return runtimeOptions
+  }
+
+  if (kind === 'multiSelect' || kind === 'checkboxGroup') {
+    return buildArrayEnumOptions(schema)
+  }
+
+  return buildEnumOptions(schema)
+}
+
 export const AntdvControlRenderer = defineComponent({
   name: 'AntdvControlRenderer',
   props: {
@@ -105,6 +152,8 @@ export const AntdvControlRenderer = defineComponent({
       const state = control.value
       const schema = state.schema as PrimitiveSchema
       const schemaType = getSchemaType(schema)
+      const widget = getUiWidget(props.uischema.options)
+      const widgetProps = resolveWidgetProps(props.uischema.options)
       const isMultiline = props.uischema.options?.multi === true
       const schemaFormConfig = resolveSchemaFormConfig(state.config)
       const validationConfig = schemaFormConfig?.validation
@@ -118,13 +167,52 @@ export const AntdvControlRenderer = defineComponent({
       const runtimeOptions = runtimeState?.options
       const description = runtimeState?.description ?? state.description
       const placeholder = runtimeState?.placeholder ?? description ?? state.label ?? undefined
+      const registeredWidgets = getSchemaFormWidgets(schemaFormConfig?.widgetsId)
+      const customWidget = widget
+        ? registeredWidgets?.[widget] ?? schemaFormConfig?.widgets?.[widget]
+        : undefined
+      const kind = resolveControlKind({
+        schema,
+        isMultiline,
+        hasOptions: runtimeOptions !== undefined || Array.isArray(schema.enum),
+        widget,
+      })
+      const required = runtimeState?.required ?? state.required
 
-      if (runtimeOptions !== undefined || Array.isArray(schema.enum)) {
+      if (customWidget) {
+        return h(toRaw(customWidget) as any, {
+          ...(widgetProps ?? {}),
+          value: state.data,
+          path: state.path,
+          label: state.label || undefined,
+          disabled,
+          required,
+          placeholder,
+          description,
+          options: runtimeOptions,
+          loading: runtimeState?.loading === true,
+          error: runtimeState?.optionsError,
+          schema,
+          uischema: props.uischema,
+          'onUpdate:value': (value: unknown) => {
+            handleChange(state.path, value)
+          },
+          onBlur: markTouched,
+        })
+      }
+
+      if (widget && !isBuiltInControlKind(widget)) {
+        return h(Text, { type: 'secondary' }, () => `Unsupported widget: ${widget}`)
+      }
+
+      const options = resolveOptions(schema, runtimeOptions, kind)
+
+      if (kind === 'select') {
         return h(SelectComponent, {
           value: state.data,
           disabled,
           loading: runtimeState?.loading === true,
-          options: runtimeOptions ?? buildEnumOptions(schema),
+          options,
           placeholder,
           notFoundContent: runtimeState?.optionsError,
           'onUpdate:value': (value: unknown) => {
@@ -134,36 +222,130 @@ export const AntdvControlRenderer = defineComponent({
         })
       }
 
-      if (schemaType === 'boolean') {
+      if (kind === 'radio') {
+        return h(RadioGroupComponent, {
+          value: state.data,
+          disabled,
+          options,
+          'onUpdate:value': (value: unknown) => {
+            markTouched()
+            handleChange(state.path, value)
+          },
+        })
+      }
+
+      if (kind === 'multiSelect') {
+        return h(SelectComponent, {
+          value: normalizeArrayValue(state.data),
+          disabled,
+          loading: runtimeState?.loading === true,
+          mode: 'multiple',
+          options,
+          placeholder,
+          notFoundContent: runtimeState?.optionsError,
+          'onUpdate:value': (value: unknown) => {
+            markTouched()
+            handleChange(state.path, normalizeArrayValue(value))
+          },
+        })
+      }
+
+      if (kind === 'checkboxGroup') {
+        return h(CheckboxGroupComponent, {
+          value: normalizeArrayValue(state.data),
+          disabled,
+          options,
+          'onUpdate:value': (value: unknown) => {
+            markTouched()
+            handleChange(state.path, normalizeArrayValue(value))
+          },
+        })
+      }
+
+      if (kind === 'switch') {
         return h(SwitchComponent, {
           checked: Boolean(state.data),
           disabled,
           'onUpdate:checked': (value: unknown) => {
             markTouched()
-            handleChange(state.path, Boolean(value))
+            handleChange(state.path, normalizeBooleanValue(value))
           },
         })
       }
 
-      if (schemaType === 'number' || schemaType === 'integer') {
+      if (kind === 'checkbox') {
+        return h(CheckboxComponent, {
+          checked: Boolean(state.data),
+          disabled,
+          'onUpdate:checked': (value: unknown) => {
+            markTouched()
+            handleChange(state.path, normalizeBooleanValue(value))
+          },
+        })
+      }
+
+      if (kind === 'number') {
         return h(InputNumberComponent, {
           value: state.data as number | undefined,
           disabled,
           style: { width: '100%' },
           'onUpdate:value': (value: number | null) => {
             markTouched()
-            handleChange(state.path, value ?? undefined)
+            handleChange(state.path, normalizeNumberValue(value))
           },
         })
       }
 
-      if (schemaType === 'string' || schemaType === undefined) {
-        const component = isMultiline ? TextArea : InputComponent
+      if (kind === 'date') {
+        return h(DatePickerComponent, {
+          value: parseDateValue(state.data, dateFormat),
+          disabled,
+          format: dateFormat,
+          placeholder,
+          style: { width: '100%' },
+          'onUpdate:value': (value: unknown) => {
+            markTouched()
+            handleChange(state.path, formatDateValue(value, dateFormat))
+          },
+        })
+      }
+
+      if (kind === 'time') {
+        return h(TimePickerComponent, {
+          value: parseDateValue(state.data, timeFormat),
+          disabled,
+          format: timeFormat,
+          placeholder,
+          style: { width: '100%' },
+          'onUpdate:value': (value: unknown) => {
+            markTouched()
+            handleChange(state.path, formatDateValue(value, timeFormat))
+          },
+        })
+      }
+
+      if (kind === 'dateTime') {
+        return h(DatePickerComponent, {
+          value: parseDateValue(state.data, dateTimeFormat),
+          disabled,
+          format: 'YYYY-MM-DD HH:mm:ss',
+          placeholder,
+          showTime: { format: timeFormat },
+          style: { width: '100%' },
+          'onUpdate:value': (value: unknown) => {
+            markTouched()
+            handleChange(state.path, formatDateValue(value, dateTimeFormat))
+          },
+        })
+      }
+
+      if (kind === 'input' || kind === 'textarea' || kind === 'password') {
+        const component = kind === 'textarea' ? TextArea : kind === 'password' ? Password : InputComponent
 
         return h(component, {
           value: state.data as string | undefined,
           disabled,
-          rows: isMultiline ? 4 : undefined,
+          rows: kind === 'textarea' ? 4 : undefined,
           placeholder,
           'onUpdate:value': (value: string) => {
             markTouched()

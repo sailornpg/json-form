@@ -1,4 +1,5 @@
 import type { ErrorObject, JsonSchema, UISchemaElement } from '@json-form/engine-adapter'
+import type { Component } from 'vue'
 
 export type SchemaFormData = Record<string, unknown> | unknown[]
 
@@ -28,6 +29,25 @@ export type SchemaFormOption = {
   disabled?: boolean
 }
 
+export type SchemaFormWidgetProps = {
+  value: unknown
+  path: string
+  label?: string
+  disabled: boolean
+  required: boolean
+  placeholder?: string
+  description?: string
+  options?: SchemaFormOption[]
+  loading?: boolean
+  error?: string
+  schema: JsonSchema
+  uischema: UISchemaElement
+}
+
+export type SchemaFormWidgetComponent = Component
+
+export type SchemaFormWidgetMap = Record<string, SchemaFormWidgetComponent>
+
 export type SchemaFormContext = {
   data: SchemaFormData
   schema: JsonSchema
@@ -48,6 +68,7 @@ export type SchemaFormFieldRuntime = {
   options?:
     | SchemaFormOption[]
     | ((context: SchemaFormContext) => SchemaFormOption[] | Promise<SchemaFormOption[]>)
+  optionsDependencies?: string[] | ((context: SchemaFormContext) => unknown)
 }
 
 export type SchemaFormFieldResolver = (args: {
@@ -67,7 +88,11 @@ export type SchemaFormEffect = (
   context: SchemaFormEffectContext,
 ) => void | Promise<void>
 
-export type SchemaFormControlOptions = {
+export type SchemaFormControlOptions<
+  TWidgetProps extends Record<string, unknown> = Record<string, unknown>,
+> = {
+  widget?: string
+  widgetProps?: TWidgetProps
   runtime?: Partial<SchemaFormFieldRuntime>
   effects?: SchemaFormEffect[]
 }

@@ -7,10 +7,14 @@ import type {
   SchemaFormFieldResolver,
   SchemaFormValidationResult,
   SchemaFormValidator,
+  SchemaFormWidgetMap,
   UISchemaElement,
 } from '@json-form/form-kit'
-import { SchemaForm } from '@json-form/form-kit'
+import { defineSchemaFormWidget, SchemaForm } from '@json-form/form-kit'
 import { computed, ref } from 'vue'
+
+import DialogUpload from './components/DialogUpload.vue'
+import MoneyInput from './components/MoneyInput.vue'
 
 type DemoFormData = {
   name?: string
@@ -21,11 +25,35 @@ type DemoFormData = {
   city?: string
   role?: 'admin' | 'editor' | 'viewer'
   subscribed?: boolean
+  bio?: string
+  password?: string
+  age?: number
+  acceptsTerms?: boolean
+  contactMethod?: 'email' | 'phone' | 'sms'
+  skills?: string[]
+  interests?: string[]
+  birthday?: string
+  startTime?: string
+  meetingAt?: string
+  budget?: string
+  attachments?: Array<{
+    name: string
+    size?: number
+    type?: string
+  }>
 }
 
 type DemoOption = {
   label: string
   value: string
+}
+
+type DialogUploadWidgetProps = {
+  accept: string
+  maxCount: number
+  multiple: boolean
+  buttonText: string
+  modalTitle: string
 }
 
 const provinceOptionsMap: Record<string, DemoOption[]> = {
@@ -56,6 +84,11 @@ const cityOptionsMap: Record<string, DemoOption[]> = {
     { label: 'New York City', value: 'new-york-city' },
     { label: 'Buffalo', value: 'buffalo' },
   ],
+}
+
+const widgets: SchemaFormWidgetMap = {
+  dialogUpload: defineSchemaFormWidget(DialogUpload),
+  moneyInput: defineSchemaFormWidget(MoneyInput),
 }
 
 const sleep = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms))
@@ -100,6 +133,68 @@ const schema: JsonSchema = {
     subscribed: {
       type: 'boolean',
     },
+    bio: {
+      type: 'string',
+    },
+    password: {
+      type: 'string',
+    },
+    age: {
+      type: 'integer',
+    },
+    acceptsTerms: {
+      type: 'boolean',
+    },
+    contactMethod: {
+      type: 'string',
+      enum: ['email', 'phone', 'sms'],
+    },
+    skills: {
+      type: 'array',
+      items: {
+        type: 'string',
+        enum: ['typescript', 'vue', 'schema', 'validation'],
+      },
+    },
+    interests: {
+      type: 'array',
+      items: {
+        type: 'string',
+        enum: ['runtime', 'effects', 'widgets', 'options'],
+      },
+    },
+    birthday: {
+      type: 'string',
+      format: 'date',
+    },
+    startTime: {
+      type: 'string',
+      format: 'time',
+    },
+    meetingAt: {
+      type: 'string',
+      format: 'date-time',
+    },
+    budget: {
+      type: 'string',
+    },
+    attachments: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          name: {
+            type: 'string',
+          },
+          size: {
+            type: 'number',
+          },
+          type: {
+            type: 'string',
+          },
+        },
+      },
+    },
   },
   required: ['name', 'accountType', 'country', 'role'],
 }
@@ -131,6 +226,20 @@ const provinceControlOptions: SchemaFormControlOptions = {
       }
     },
   ],
+}
+
+const attachmentsControlOptions: SchemaFormControlOptions<DialogUploadWidgetProps> = {
+  widget: 'dialogUpload',
+  widgetProps: {
+    accept: '.png,.jpg,.pdf',
+    maxCount: 3,
+    multiple: true,
+    buttonText: '选择附件',
+    modalTitle: '上传附件',
+  },
+  runtime: {
+    placeholder: '请选择附件',
+  },
 }
 
 const uischema: UISchemaElement = {
@@ -194,6 +303,117 @@ const uischema: UISchemaElement = {
         },
       ],
     },
+    {
+      type: 'Group',
+      label: 'Basic Controls Matrix',
+      elements: [
+        {
+          type: 'HorizontalLayout',
+          elements: [
+            {
+              type: 'Control',
+              label: 'Bio',
+              scope: '#/properties/bio',
+              options: {
+                widget: 'textarea',
+                runtime: {
+                  placeholder: 'Tell us about this account',
+                },
+              },
+            },
+            {
+              type: 'Control',
+              label: 'Password',
+              scope: '#/properties/password',
+              options: {
+                widget: 'password',
+              },
+            },
+          ],
+        },
+        {
+          type: 'HorizontalLayout',
+          elements: [
+            {
+              type: 'Control',
+              label: 'Age',
+              scope: '#/properties/age',
+            },
+            {
+              type: 'Control',
+              label: 'Accepts Terms',
+              scope: '#/properties/acceptsTerms',
+              options: {
+                widget: 'checkbox',
+              },
+            },
+          ],
+        },
+        {
+          type: 'HorizontalLayout',
+          elements: [
+            {
+              type: 'Control',
+              label: 'Contact Method',
+              scope: '#/properties/contactMethod',
+              options: {
+                widget: 'radio',
+              },
+            },
+            {
+              type: 'Control',
+              label: 'Skills',
+              scope: '#/properties/skills',
+            },
+          ],
+        },
+        {
+          type: 'Control',
+          label: 'Interests',
+          scope: '#/properties/interests',
+          options: {
+            widget: 'checkboxGroup',
+          },
+        },
+        {
+          type: 'HorizontalLayout',
+          elements: [
+            {
+              type: 'Control',
+              label: 'Birthday',
+              scope: '#/properties/birthday',
+            },
+            {
+              type: 'Control',
+              label: 'Start Time',
+              scope: '#/properties/startTime',
+            },
+            {
+              type: 'Control',
+              label: 'Meeting At',
+              scope: '#/properties/meetingAt',
+            },
+          ],
+        },
+        {
+          type: 'Control',
+          label: 'Budget',
+          scope: '#/properties/budget',
+          options: {
+            widget: 'moneyInput',
+            runtime: {
+              placeholder: 'Custom widget example',
+            },
+          },
+        },
+        {
+          type: 'Control',
+          label: 'Attachments',
+          scope: '#/properties/attachments',
+          options: attachmentsControlOptions,
+        },
+      ],
+    },
   ],
 }
 
@@ -203,6 +423,18 @@ const formData = ref<DemoFormData>({
   country: 'CN',
   role: 'editor',
   subscribed: true,
+  bio: 'Schema-driven forms with runtime behavior.',
+  password: 'secret',
+  age: 36,
+  acceptsTerms: true,
+  contactMethod: 'email',
+  skills: ['typescript', 'vue'],
+  interests: ['runtime', 'widgets'],
+  birthday: '1815-12-10',
+  startTime: '09:30:00',
+  meetingAt: '2026-04-29T10:00:00',
+  budget: '1200',
+  attachments: [],
 })
 
 const formRef = ref<SchemaFormExposed>()
@@ -216,6 +448,13 @@ const validators: SchemaFormValidator[] = [
     }
 
     const errors = []
+    if (!data.name) {
+      errors.push({
+        path: 'name',
+        message: '请填写名称！',
+        source: 'custom' as const,
+      })
+    }
 
     if (data.accountType === 'business' && !data.company) {
       errors.push({
@@ -245,6 +484,7 @@ const fieldResolvers: SchemaFormFieldResolver[] = [
         description: context.getValue('country')
           ? '全局 resolver：省州选项会根据国家异步加载。'
           : '全局 resolver：选择国家后加载省州选项。',
+        optionsDependencies: ['country'],
         options: async (ctx) => loadProvinceOptions(ctx.getValue('country')),
       }
     }
@@ -258,6 +498,7 @@ const fieldResolvers: SchemaFormFieldResolver[] = [
         description: context.getValue('province')
           ? '全局 resolver：城市选项会根据省州异步加载。'
           : '全局 resolver：选择省州后加载城市选项。',
+        optionsDependencies: ['province'],
         options: async (ctx) => loadCityOptions(ctx.getValue('province')),
       }
     }
@@ -332,6 +573,7 @@ const resetValidation = () => {
           :data="formData"
           :schema="schema"
           :uischema="uischema"
+          :widgets="widgets"
           :validators="validators"
           :field-resolvers="fieldResolvers"
           :effects="effects"

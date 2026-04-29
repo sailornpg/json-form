@@ -50,11 +50,17 @@ const isControlElement = (uischema: UISchemaElement): uischema is SchemaFormCont
   uischema.type === 'Control' && typeof (uischema as SchemaFormControlElement).scope === 'string'
 
 const cloneData = <T>(data: T): T => {
-  if (!isObjectLike(data) && !Array.isArray(data)) {
-    return data
+  if (Array.isArray(data)) {
+    return data.map((item) => cloneData(item)) as T
   }
 
-  return structuredClone(data)
+  if (isObjectLike(data)) {
+    return Object.fromEntries(
+      Object.entries(data).map(([key, value]) => [key, cloneData(value)]),
+    ) as T
+  }
+
+  return data
 }
 
 const toPathSegments = (path: string) => path.split('.').filter(Boolean)

@@ -8,10 +8,17 @@ import {
 } from '@json-form/engine-adapter'
 import { antdvCells, antdvRenderers } from '@json-form/renderer-antdv'
 import {
+  registerSchemaFormWidgets,
+  unregisterSchemaFormWidgets,
+} from '@json-form/renderer-antdv'
+import {
   computed,
   defineComponent,
   h,
+  markRaw,
+  onUnmounted,
   shallowRef,
+  toRaw,
   watch,
   type PropType,
 } from 'vue'
@@ -46,6 +53,7 @@ import type {
   SchemaFormValidateOptions,
   SchemaFormValidationResult,
   SchemaFormValidator,
+  SchemaFormWidgetMap,
   ValidationDisplayMode,
 } from './types'
 
@@ -64,6 +72,19 @@ const copyFormDataRoot = <T extends SchemaFormData>(data: T): T => {
 const areSameSchemaErrors = (left: ErrorObject[], right: ErrorObject[]) =>
   JSON.stringify(left) === JSON.stringify(right)
 
+let schemaFormIdSeed = 0
+
+const normalizeWidgets = (widgets: SchemaFormWidgetMap | undefined): SchemaFormWidgetMap => {
+  const rawWidgets = toRaw(widgets ?? {}) as SchemaFormWidgetMap
+  const normalizedWidgets: SchemaFormWidgetMap = {}
+
+  for (const [name, widget] of Object.entries(rawWidgets)) {
+    normalizedWidgets[name] = markRaw(toRaw(widget) as SchemaFormWidgetMap[string])
+  }
+
+  return markRaw(normalizedWidgets)
+}
+
 type SchemaFormInternalConfig = {
   __schemaForm: {
     validation: {
@@ -72,6 +93,7 @@ type SchemaFormInternalConfig = {
       touchedPaths: string[]
       onFieldInput: (path: string) => void
     }
+    widgetsId: string
     fields: DynamicFieldStateMap
   }
 }
@@ -122,6 +144,11 @@ export const SchemaForm = defineComponent({
       required: false,
       default: () => [],
     },
+    widgets: {
+      type: Object as PropType<SchemaFormWidgetMap>,
+      required: false,
+      default: () => ({}),
+    },
     validationDisplayMode: {
       type: String as PropType<ValidationDisplayMode>,
       required: false,
@@ -149,6 +176,7 @@ export const SchemaForm = defineComponent({
     const hasEmittedRuntimeChange = shallowRef(false)
     const optionRequestIds = new Map<string, number>()
     const optionRequestSignatures = new Map<string, string>()
+    const widgetsId = `schema-form-${++schemaFormIdSeed}`
 
     watch(
       () => props.data,
@@ -254,6 +282,21 @@ export const SchemaForm = defineComponent({
     })
     const effectiveRenderers = computed(() => props.renderers ?? defaultRenderers)
     const effectiveCells = computed(() => props.cells ?? defaultCells)
+    const effectiveWidgets = computed(() => normalizeWidgets(props.widgets))
+
+    watch(
+      effectiveWidgets,
+      (widgets) => {
+        registerSchemaFormWidgets(widgetsId, widgets)
+      },
+      {
+        immediate: true,
+      },
+    )
+
+    onUnmounted(() => {
+      unregisterSchemaFormWidgets(widgetsId)
+    })
 
     const buildResult = (
       data: SchemaFormData = currentData.value,
@@ -339,6 +382,32 @@ export const SchemaForm = defineComponent({
       return clearValueAtPath(data, path)
     }
 
+    const buildOptionRequestSignature = (field: (typeof resolvedFields.value)[number]) => {
+      const dependencies = field.runtime.optionsDependencies
+
+      if (Array.isArray(dependencies)) {
+        return JSON.stringify({
+          path: field.definition.path,
+          dependencies: dependencies.map((path) => [
+            path,
+            formContext.value.getValue(path),
+          ]),
+        })
+      }
+
+      if (typeof dependencies === 'function') {
+        return JSON.stringify({
+          path: field.definition.path,
+          dependencies: dependencies(formContext.value),
+        })
+      }
+
+      return JSON.stringify({
+        path: field.definition.path,
+        data: currentData.value,
+      })
+    }
+
     watch(
       resolvedFields,
       () => {
@@ -364,10 +433,7 @@ export const SchemaForm = defineComponent({
 
           activeAsyncPaths.add(field.definition.path)
           const previousState = asyncFieldStates.value[field.definition.path]
-          const requestSignature = JSON.stringify({
-            path: field.definition.path,
-            data: currentData.value,
-          })
+          const requestSignature = buildOptionRequestSignature(field)
 
           if (
             previousState !== undefined &&
@@ -507,6 +573,7 @@ export const SchemaForm = defineComponent({
           touchedPaths: touchedPaths.value,
           onFieldInput: trackFieldInput,
         },
+        widgetsId,
         fields: fieldStates.value,
       },
     }))

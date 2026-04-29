@@ -5,6 +5,12 @@ import { antdvLayoutRendererEntry } from './AntdvLayoutRenderer'
 
 export { AntdvControlRenderer, antdvControlRendererEntry } from './AntdvControlRenderer'
 export { AntdvLayoutRenderer, antdvLayoutRendererEntry } from './AntdvLayoutRenderer'
+export {
+  getSchemaFormWidgets,
+  registerSchemaFormWidgets,
+  unregisterSchemaFormWidgets,
+  type SchemaFormWidgetMap,
+} from './widgetRegistry'
 
 export const antdvRenderers = Object.freeze<JsonFormsRendererRegistryEntry[]>([
   antdvLayoutRendererEntry,
