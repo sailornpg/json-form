@@ -1,23 +1,33 @@
 {
   "name": "@json-form/renderer-antdv",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
   "type": "module",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.build.json"
   },
+  "peerDependencies": {
+    "ant-design-vue": "^4.2.6",
+    "vue": "^3.5.32"
+  },
   "dependencies": {
-    "@json-form/engine-adapter": "file:../engine-adapter",
-    "@json-form/form-protocol": "file:../form-protocol",
+    "@json-form/engine-adapter": "^0.1.0",
+    "@json-form/form-protocol": "^0.1.0",
     "@jsonforms/core": "^3.6.0",
     "@jsonforms/vue": "^3.6.0",
-    "ant-design-vue": "^4.2.6",
-    "dayjs": "^1.11.20",
-    "vue": "^3.5.32"
+    "dayjs": "^1.11.20"
   }
 }
