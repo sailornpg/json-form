@@ -1,5 +1,5 @@
 {
-  "name": "@json-form/form-kit",
+  "name": "@json-form/form-protocol",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -13,8 +13,6 @@
   },
   "dependencies": {
     "@json-form/engine-adapter": "file:../engine-adapter",
-    "@json-form/form-protocol": "file:../form-protocol",
-    "@json-form/renderer-antdv": "file:../renderer-antdv",
     "vue": "^3.5.32"
   }
 }

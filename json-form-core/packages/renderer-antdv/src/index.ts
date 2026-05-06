@@ -1,4 +1,5 @@
 import type { JsonFormsCellRendererRegistryEntry, JsonFormsRendererRegistryEntry } from '@json-form/engine-adapter'
+import type { SchemaFormRendererPreset } from '@json-form/form-protocol'
 
 import { antdvControlRendererEntry } from './AntdvControlRenderer'
 import { antdvLayoutRendererEntry } from './AntdvLayoutRenderer'
@@ -18,3 +19,8 @@ export const antdvRenderers = Object.freeze<JsonFormsRendererRegistryEntry[]>([
 ])
 
 export const antdvCells = Object.freeze<JsonFormsCellRendererRegistryEntry[]>([])
+
+export const antdvPreset = Object.freeze<SchemaFormRendererPreset>({
+  renderers: antdvRenderers,
+  cells: antdvCells,
+})

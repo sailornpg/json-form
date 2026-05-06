@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@json-form/form-kit": "file:../../packages/form-kit",
+    "@json-form/renderer-antdv": "file:../../packages/renderer-antdv",
     "vue": "^3.5.32"
   }
 }

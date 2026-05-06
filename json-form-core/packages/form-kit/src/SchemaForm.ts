@@ -10,7 +10,7 @@ import { antdvCells, antdvRenderers } from '@json-form/renderer-antdv'
 import {
   registerSchemaFormWidgets,
   unregisterSchemaFormWidgets,
-} from '@json-form/renderer-antdv'
+} from '@json-form/form-protocol'
 import {
   computed,
   defineComponent,
@@ -49,6 +49,7 @@ import type {
   SchemaFormExposed,
   SchemaFormFieldResolver,
   SchemaFormOption,
+  SchemaFormRendererPreset,
   SchemaFormSubmitOptions,
   SchemaFormValidateOptions,
   SchemaFormValidationResult,
@@ -121,6 +122,11 @@ export const SchemaForm = defineComponent({
     },
     cells: {
       type: Array as PropType<JsonFormsCellRendererRegistryEntry[]>,
+      required: false,
+      default: undefined,
+    },
+    rendererPreset: {
+      type: Object as PropType<SchemaFormRendererPreset>,
       required: false,
       default: undefined,
     },
@@ -280,8 +286,12 @@ export const SchemaForm = defineComponent({
 
       return nextStates
     })
-    const effectiveRenderers = computed(() => props.renderers ?? defaultRenderers)
-    const effectiveCells = computed(() => props.cells ?? defaultCells)
+    const effectiveRenderers = computed(() =>
+      props.renderers ?? props.rendererPreset?.renderers ?? defaultRenderers,
+    )
+    const effectiveCells = computed(() =>
+      props.cells ?? props.rendererPreset?.cells ?? defaultCells,
+    )
     const effectiveWidgets = computed(() => normalizeWidgets(props.widgets))
 
     watch(

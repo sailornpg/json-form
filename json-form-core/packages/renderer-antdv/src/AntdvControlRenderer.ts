@@ -6,6 +6,10 @@ import {
 } from '@jsonforms/core'
 import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
 import {
+  getSchemaFormWidgets,
+  type SchemaFormRendererConfig,
+} from '@json-form/form-protocol'
+import {
   Checkbox,
   DatePicker,
   Form,
@@ -40,8 +44,6 @@ import {
   parseDateValue,
   timeFormat,
 } from './controlValues'
-import { getSchemaFormWidgets, type SchemaFormWidgetMap } from './widgetRegistry'
-
 const FormItem = Form.Item
 const TextArea = Input.TextArea as any
 const Password = Input.Password as any
@@ -56,31 +58,6 @@ const SelectComponent = Select as any
 const SwitchComponent = Switch as any
 const TimePickerComponent = TimePicker as any
 
-type SchemaFormValidationConfig = {
-  displayMode?: 'touched' | 'submit' | 'always'
-  submitted?: boolean
-  touchedPaths?: string[]
-  onFieldInput?: (path: string) => void
-}
-
-type SchemaFormFieldState = {
-  visible?: boolean
-  disabled?: boolean
-  required?: boolean
-  placeholder?: string
-  description?: string
-  options?: SchemaFormFieldOption[]
-  loading?: boolean
-  optionsError?: string
-}
-
-type SchemaFormInternalConfig = {
-  validation?: SchemaFormValidationConfig
-  widgetsId?: string
-  widgets?: SchemaFormWidgetMap
-  fields?: Record<string, SchemaFormFieldState>
-}
-
 const resolveWidgetProps = (options: unknown) => {
   if (!options || typeof options !== 'object') {
     return undefined
@@ -92,16 +69,16 @@ const resolveWidgetProps = (options: unknown) => {
     : undefined
 }
 
-const resolveSchemaFormConfig = (config: unknown): SchemaFormInternalConfig | undefined => {
+const resolveSchemaFormConfig = (config: unknown): SchemaFormRendererConfig | undefined => {
   if (!config || typeof config !== 'object') {
     return undefined
   }
 
-  return (config as { __schemaForm?: SchemaFormInternalConfig }).__schemaForm
+  return (config as { __schemaForm?: SchemaFormRendererConfig }).__schemaForm
 }
 
 const shouldDisplayErrors = (
-  config: SchemaFormValidationConfig | undefined,
+  config: SchemaFormRendererConfig['validation'] | undefined,
   path: string,
 ) => {
   if (!config || config.displayMode === undefined || config.displayMode === 'always') {
@@ -120,7 +97,7 @@ const shouldDisplayErrors = (
 }
 
 const resolveFieldState = (
-  config: SchemaFormInternalConfig | undefined,
+  config: SchemaFormRendererConfig | undefined,
   path: string,
 ) => config?.fields?.[path]
 

@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "dev": "npm run dev --workspace @json-form/demo",
-    "build": "npm run build --workspace @json-form/engine-adapter && npm run build --workspace @json-form/renderer-antdv && npm run build --workspace @json-form/form-kit && npm run build --workspace @json-form/demo",
+    "build": "npm run build --workspace @json-form/engine-adapter && npm run build --workspace @json-form/form-protocol && npm run build --workspace @json-form/renderer-antdv && npm run build --workspace @json-form/form-kit && npm run build --workspace @json-form/demo",
     "preview": "npm run preview --workspace @json-form/demo"
   },
   "devDependencies": {

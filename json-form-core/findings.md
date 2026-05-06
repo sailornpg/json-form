@@ -113,3 +113,4 @@ Last Updated: 2026-04-21
 - Avoid introducing a custom expression DSL in phase 1.
 - Keep the workspace able to run a demo app early, even while package extraction is in progress.
 - Keep the initial renderer set intentionally small until the adapter and extension contracts stabilize.
+- UI-neutral renderer work should avoid a `form-kit <-> renderer-antdv` package cycle. A thin protocol package is the clean shared dependency for widget registry, renderer preset types, and renderer config types.

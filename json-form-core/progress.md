@@ -165,3 +165,16 @@ Last Updated: 2026-04-21
 
 - Confirmed `docs/architecture.md` exists.
 - Confirmed the document contains the expected top-level sections and Mermaid blocks.
+
+## Session 6
+
+### Goal
+
+- Implement the approved UI-neutral renderer preset and widget protocol first slice.
+
+### Plan
+
+- Use a new `@json-form/form-protocol` package to avoid a `form-kit <-> renderer-antdv` package cycle.
+- Add `rendererPreset` support to `SchemaForm`.
+- Export `antdvPreset` and update the demo to pass it explicitly.
+- Run the root build after package manifest and lockfile updates.

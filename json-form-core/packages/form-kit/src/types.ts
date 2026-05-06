@@ -1,9 +1,16 @@
 import type { ErrorObject, JsonSchema, UISchemaElement } from '@json-form/engine-adapter'
-import type { Component } from 'vue'
+import type { SchemaFormOption } from '@json-form/form-protocol'
+
+export type {
+  SchemaFormOption,
+  SchemaFormRendererPreset,
+  SchemaFormWidgetComponent,
+  SchemaFormWidgetMap,
+  SchemaFormWidgetProps,
+  ValidationDisplayMode,
+} from '@json-form/form-protocol'
 
 export type SchemaFormData = Record<string, unknown> | unknown[]
-
-export type ValidationDisplayMode = 'touched' | 'submit' | 'always'
 
 export type SchemaFormErrorSource = 'schema' | 'custom'
 
@@ -22,31 +29,6 @@ export type SchemaFormValidatorContext = {
 export type SchemaFormValidator = (
   context: SchemaFormValidatorContext,
 ) => SchemaFormError[] | void
-
-export type SchemaFormOption = {
-  label: string
-  value: unknown
-  disabled?: boolean
-}
-
-export type SchemaFormWidgetProps = {
-  value: unknown
-  path: string
-  label?: string
-  disabled: boolean
-  required: boolean
-  placeholder?: string
-  description?: string
-  options?: SchemaFormOption[]
-  loading?: boolean
-  error?: string
-  schema: JsonSchema
-  uischema: UISchemaElement
-}
-
-export type SchemaFormWidgetComponent = Component
-
-export type SchemaFormWidgetMap = Record<string, SchemaFormWidgetComponent>
 
 export type SchemaFormContext = {
   data: SchemaFormData

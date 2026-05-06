@@ -11,6 +11,7 @@ import type {
   UISchemaElement,
 } from '@json-form/form-kit'
 import { defineSchemaFormWidget, SchemaForm } from '@json-form/form-kit'
+import { antdvPreset } from '@json-form/renderer-antdv'
 import { computed, ref } from 'vue'
 
 import DialogUpload from './components/DialogUpload.vue'
@@ -573,6 +574,7 @@ const resetValidation = () => {
           :data="formData"
           :schema="schema"
           :uischema="uischema"
+          :renderer-preset="antdvPreset"
           :widgets="widgets"
           :validators="validators"
           :field-resolvers="fieldResolvers"

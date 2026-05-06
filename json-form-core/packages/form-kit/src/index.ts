@@ -13,6 +13,7 @@ export type {
   SchemaFormFieldResolver,
   SchemaFormFieldRuntime,
   SchemaFormOption,
+  SchemaFormRendererPreset,
   SchemaFormSubmitOptions,
   SchemaFormValidateOptions,
   SchemaFormValidationResult,

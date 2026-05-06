@@ -30,8 +30,31 @@ Build an engine-first JSON Schema form library for Vue 3 based on `@jsonforms/co
 | 7. Demo scenarios | pending | Build representative complex forms proving arrays, nesting, tabs, collapse, grid, rules, and async options |
 | 8. Testing and verification | pending | Add automated tests and manual verification coverage for critical flows |
 | 9. Documentation and release readiness | pending | Document usage, architecture, extension model, and known limits |
+| 10. UI-neutral renderer preset and widget protocol | in_progress | Implement the first non-breaking slice from the approved 2026-04-29 renderer preset design |
 
 ## Phase Details
+
+### Phase 10. UI-neutral renderer preset and widget protocol
+
+Tasks:
+
+- Add a UI-neutral protocol package for renderer presets, widget types, renderer config, and widget registry.
+- Add `rendererPreset` to `SchemaForm` while preserving existing `renderers/cells` behavior.
+- Export `antdvPreset` from `renderer-antdv`.
+- Move Antdv renderer widget-registry usage onto the shared protocol package.
+- Update the demo to pass `antdvPreset` explicitly.
+- Validate with the root build.
+
+Exit criteria:
+
+- Existing demo behavior remains compatible.
+- Custom widgets still work through `widgets + uischema.options.widget`.
+- `rendererPreset` works and direct `renderers/cells` remain higher priority.
+- `npm run build` passes.
+
+Status notes:
+
+- In progress. To avoid a package cycle, the implementation will use a small `@json-form/form-protocol` package instead of making `renderer-antdv` import from `form-kit`.
 
 ### Phase 0. Repository baseline and workspace reshape
 
