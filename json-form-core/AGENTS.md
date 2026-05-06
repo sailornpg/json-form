@@ -29,3 +29,17 @@ When writing spec documents for this repository, write them in Chinese by defaul
 
 ## Security & Configuration Tips
 Do not hardcode secrets or environment-specific values in source files. Keep runtime configuration out of the repo unless it is safe to publish, and avoid committing generated output from `dist/`.
+
+## Agent skills
+
+### Issue tracker
+
+本仓库的问题与 PRD 记录在 `sailornpg/json-form` 的 GitHub Issues 中。详见 `docs/agents/issue-tracker.md`。
+
+### Triage labels
+
+本仓库使用默认的五个分诊标签：`needs-triage`、`needs-info`、`ready-for-agent`、`ready-for-human`、`wontfix`。详见 `docs/agents/triage-labels.md`。
+
+### Domain docs
+
+本仓库按 single-context 方式配置：相关 skill 在这些文档存在时，应优先读取仓库根目录的 `CONTEXT.md` 与 `docs/adr/`。详见 `docs/agents/domain.md`。
