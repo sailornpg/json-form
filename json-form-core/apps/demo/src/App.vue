@@ -16,6 +16,7 @@ import { computed, ref } from 'vue'
 
 import DialogUpload from './components/DialogUpload.vue'
 import MoneyInput from './components/MoneyInput.vue'
+import { proofTitleRendererEntry } from './components/ProofTitleRenderer'
 
 type DemoFormData = {
   name?: string
@@ -42,6 +43,12 @@ type DemoFormData = {
     size?: number
     type?: string
   }>
+}
+
+type ProofFormData = {
+  proofTitle?: string
+  proofRole?: 'preset' | 'override'
+  proofBudget?: string
 }
 
 type DemoOption = {
@@ -441,6 +448,61 @@ const formData = ref<DemoFormData>({
 const formRef = ref<SchemaFormExposed>()
 const lastValidation = ref<SchemaFormValidationResult | null>(null)
 const submitMessage = ref('点击提交以验证动态联动、effects 与异步下拉。')
+const proofData = ref<ProofFormData>({
+  proofTitle: 'Renderer preset compatibility',
+  proofRole: 'preset',
+  proofBudget: '8800',
+})
+
+const proofSchema: JsonSchema = {
+  type: 'object',
+  properties: {
+    proofTitle: {
+      type: 'string',
+    },
+    proofRole: {
+      type: 'string',
+      enum: ['preset', 'override'],
+    },
+    proofBudget: {
+      type: 'string',
+    },
+  },
+  required: ['proofTitle', 'proofRole'],
+}
+
+const proofUiSchema: UISchemaElement = {
+  type: 'Group',
+  label: 'Compatibility Proof',
+  elements: [
+    {
+      type: 'Control',
+      label: 'Proof Title',
+      scope: '#/properties/proofTitle',
+      options: {
+        proofOverride: true,
+      },
+    },
+    {
+      type: 'Control',
+      label: 'Proof Role',
+      scope: '#/properties/proofRole',
+    },
+    {
+      type: 'Control',
+      label: 'Proof Budget',
+      scope: '#/properties/proofBudget',
+      options: {
+        widget: 'moneyInput',
+        runtime: {
+          placeholder: 'Custom widget still works under preset + override',
+        },
+      },
+    },
+  ],
+}
+
+const proofRenderers = [proofTitleRendererEntry]
 
 const validators: SchemaFormValidator[] = [
   ({ data }) => {
@@ -522,6 +584,12 @@ const errorSummary = computed(() => lastValidation.value?.errors ?? [])
 const handleDataChange = (nextData: Record<string, unknown> | unknown[]) => {
   if (!Array.isArray(nextData)) {
     formData.value = nextData as DemoFormData
+  }
+}
+
+const handleProofDataChange = (nextData: Record<string, unknown> | unknown[]) => {
+  if (!Array.isArray(nextData)) {
+    proofData.value = nextData as ProofFormData
   }
 }
 
@@ -613,5 +681,46 @@ const resetValidation = () => {
         <pre class="json-preview">{{ JSON.stringify(formData, null, 2) }}</pre>
       </section>
     </main>
+
+    <section class="panel proof-panel">
+      <div class="panel-header">
+        <h2>Compatibility Proof</h2>
+        <p>
+          这一块用同一个 <code>SchemaForm</code> 同时证明三件事：<code>rendererPreset</code>
+          提供默认 renderer、direct <code>renderers</code> 可以局部覆盖、custom widget 继续可用。
+        </p>
+      </div>
+
+      <div class="proof-grid">
+        <div>
+          <SchemaForm
+            :data="proofData"
+            :schema="proofSchema"
+            :uischema="proofUiSchema"
+            :renderer-preset="antdvPreset"
+            :renderers="proofRenderers"
+            :widgets="widgets"
+            @update:data="handleProofDataChange"
+          />
+        </div>
+
+        <div class="proof-notes">
+          <div class="proof-note">
+            <strong>1. Direct override</strong>
+            <span>`Proof Title` 字段显示自定义标记和原生输入框，证明 direct renderer 优先生效。</span>
+          </div>
+          <div class="proof-note">
+            <strong>2. Preset default</strong>
+            <span>`Proof Role` 继续走 preset 默认控件，说明其余字段仍由 `antdvPreset` 托底。</span>
+          </div>
+          <div class="proof-note">
+            <strong>3. Custom widget</strong>
+            <span>`Proof Budget` 继续使用 `moneyInput` widget，说明 custom widget 链路没有被 override 破坏。</span>
+          </div>
+
+          <pre class="json-preview proof-json">{{ JSON.stringify(proofData, null, 2) }}</pre>
+        </div>
+      </div>
+    </section>
   </div>
 </template>

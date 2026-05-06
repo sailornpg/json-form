@@ -24,6 +24,72 @@
 />
 ```
 
+### 推荐接法：优先显式传入 `rendererPreset`
+
+当前仓库推荐业务页面显式传入 UI 预设，而不是依赖隐式默认 renderer。
+
+示例：
+
+```vue
+<script setup lang="ts">
+import { SchemaForm } from '@json-form/form-kit'
+import { antdvPreset } from '@json-form/renderer-antdv'
+</script>
+
+<template>
+  <SchemaForm
+    :data="formData"
+    :schema="schema"
+    :uischema="uischema"
+    :renderer-preset="antdvPreset"
+  />
+</template>
+```
+
+这样做的好处是：
+
+- 页面使用了哪一套 renderer 一目了然
+- 后续替换 UI 预设时，只需要替换 preset 输入
+- 更符合当前仓库“核心 API 与 UI 预设解耦”的演进方向
+
+## `rendererPreset`、`renderers`、`cells` 的关系
+
+三者的职责不同：
+
+- `rendererPreset`：提供一整套默认 renderer/cell 能力，适合普通业务接入
+- `renderers`：用于局部或深度覆盖某些 renderer
+- `cells`：用于覆盖 cell renderer
+
+推荐理解方式：
+
+- 普通业务优先用 `rendererPreset`
+- 只有在你确实要替换某个字段或布局的渲染逻辑时，才额外传 `renderers/cells`
+
+### 优先级规则
+
+当页面同时传入 `rendererPreset` 和 direct `renderers/cells` 时，当前实现采用：
+
+- direct `renderers/cells` 优先
+- `rendererPreset` 作为其余未覆盖项的默认回退
+
+这意味着 direct override 是“局部覆盖”，而不是“完全替换整套 preset”。
+
+示意：
+
+```vue
+<SchemaForm
+  :renderer-preset="antdvPreset"
+  :renderers="[customTitleRenderer]"
+/>
+```
+
+上面的含义不是“只使用 `customTitleRenderer`”，而是：
+
+- 命中的字段先走 `customTitleRenderer`
+- 其余字段继续走 `antdvPreset` 提供的默认 renderer
+
+如果只传 `renderers`，不传 `rendererPreset`，则按 direct `renderers` 独立运行。
+
 ## 配置职责
 
 | 能力 | 推荐位置 | 说明 |
@@ -158,6 +224,24 @@ const widgets: SchemaFormWidgetMap = {
   },
 }
 ```
+
+### 与 `rendererPreset` / direct override 的兼容关系
+
+custom widget 的接入方式不依赖某个特定 preset，也不会因为局部 direct renderer override 而自动失效。
+
+当前推荐把三者理解成不同层次：
+
+- `rendererPreset`：决定整套默认渲染能力
+- direct `renderers`：只覆盖个别字段或布局的 renderer
+- `widgets + uischema.options.widget`：只替换某个字段内部使用的业务输入组件
+
+也就是说，在同一个 `SchemaForm` 中可以同时存在：
+
+- 某些字段走 preset 默认 renderer
+- 某个字段走 direct override renderer
+- 另一个字段继续走 custom widget
+
+这也是当前 demo 页面 `Compatibility Proof` 区块要展示的能力。
 
 ## widgetProps
 

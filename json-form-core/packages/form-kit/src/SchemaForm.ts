@@ -86,6 +86,24 @@ const normalizeWidgets = (widgets: SchemaFormWidgetMap | undefined): SchemaFormW
   return markRaw(normalizedWidgets)
 }
 
+const mergeRendererEntries = <T>(
+  overrides: readonly T[] | undefined,
+  presetEntries: readonly T[] | undefined,
+  defaultEntries: readonly T[],
+) => {
+  if (overrides !== undefined) {
+    return presetEntries !== undefined
+      ? [...overrides, ...presetEntries]
+      : [...overrides]
+  }
+
+  if (presetEntries !== undefined) {
+    return [...presetEntries]
+  }
+
+  return defaultEntries
+}
+
 type SchemaFormInternalConfig = {
   __schemaForm: {
     validation: {
@@ -287,10 +305,18 @@ export const SchemaForm = defineComponent({
       return nextStates
     })
     const effectiveRenderers = computed(() =>
-      props.renderers ?? props.rendererPreset?.renderers ?? defaultRenderers,
+      mergeRendererEntries(
+        props.renderers,
+        props.rendererPreset?.renderers,
+        defaultRenderers,
+      ),
     )
     const effectiveCells = computed(() =>
-      props.cells ?? props.rendererPreset?.cells ?? defaultCells,
+      mergeRendererEntries(
+        props.cells,
+        props.rendererPreset?.cells,
+        defaultCells,
+      ),
     )
     const effectiveWidgets = computed(() => normalizeWidgets(props.widgets))
 
