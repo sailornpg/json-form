@@ -3,7 +3,7 @@ import type {
   JsonFormsRendererRegistryEntry,
   JsonSchema,
   UISchemaElement,
-} from '@json-form/engine-adapter'
+} from '@sailornpg/engine-adapter'
 import type { Component } from 'vue'
 
 export type ValidationDisplayMode = 'touched' | 'submit' | 'always'

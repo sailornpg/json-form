@@ -8,7 +8,7 @@ import { rendererProps, useJsonFormsControl } from '@jsonforms/vue'
 import {
   getSchemaFormWidgets,
   type SchemaFormRendererConfig,
-} from '@json-form/form-protocol'
+} from '@sailornpg/form-protocol'
 import {
   Checkbox,
   DatePicker,

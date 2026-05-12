@@ -9,9 +9,9 @@ import type {
   SchemaFormValidator,
   SchemaFormWidgetMap,
   UISchemaElement,
-} from '@json-form/form-kit'
-import { defineSchemaFormWidget, SchemaForm } from '@json-form/form-kit'
-import { antdvPreset } from '@json-form/renderer-antdv'
+} from '@sailornpg/form-kit'
+import { defineSchemaFormWidget, SchemaForm } from '@sailornpg/form-kit'
+import { antdvPreset } from '@sailornpg/renderer-antdv'
 import { computed, ref } from 'vue'
 
 import DialogUpload from './components/DialogUpload.vue'

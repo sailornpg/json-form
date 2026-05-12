@@ -1,17 +1,17 @@
-# @json-form/renderer-antdv
+# @sailornpg/renderer-antdv
 
-`@json-form/renderer-antdv` 提供当前仓库的一等 Ant Design Vue renderer adapter。
+`@sailornpg/renderer-antdv` 提供当前仓库的一等 Ant Design Vue renderer adapter。
 
 ## 安装
 
 ```bash
-npm install @json-form/renderer-antdv @json-form/form-kit vue ant-design-vue
+npm install @sailornpg/renderer-antdv @sailornpg/form-kit vue ant-design-vue
 ```
 
 ## 用法
 
 ```ts
-import { antdvPreset } from '@json-form/renderer-antdv'
+import { antdvPreset } from '@sailornpg/renderer-antdv'
 ```
 
 ```vue

@@ -1,4 +1,4 @@
-import { encode, getControlPath, type JsonSchema, type UISchemaElement } from '@json-form/engine-adapter'
+import { encode, getControlPath, type JsonSchema, type UISchemaElement } from '@sailornpg/engine-adapter'
 import type { ErrorObject } from 'ajv'
 
 import type {

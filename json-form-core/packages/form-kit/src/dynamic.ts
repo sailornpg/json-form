@@ -5,7 +5,7 @@ import {
   toDataPath,
   type JsonSchema,
   type UISchemaElement,
-} from '@json-form/engine-adapter'
+} from '@sailornpg/engine-adapter'
 
 import type {
   SchemaFormContext,

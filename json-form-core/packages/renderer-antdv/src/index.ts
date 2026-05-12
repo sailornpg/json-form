@@ -1,5 +1,5 @@
-import type { JsonFormsCellRendererRegistryEntry, JsonFormsRendererRegistryEntry } from '@json-form/engine-adapter'
-import type { SchemaFormRendererPreset } from '@json-form/form-protocol'
+import type { JsonFormsCellRendererRegistryEntry, JsonFormsRendererRegistryEntry } from '@sailornpg/engine-adapter'
+import type { SchemaFormRendererPreset } from '@sailornpg/form-protocol'
 
 import { antdvControlRendererEntry } from './AntdvControlRenderer'
 import { antdvLayoutRendererEntry } from './AntdvLayoutRenderer'

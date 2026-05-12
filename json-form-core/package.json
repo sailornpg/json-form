@@ -8,9 +8,12 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run dev --workspace @json-form/demo",
-    "build": "npm run build --workspace @json-form/engine-adapter && npm run build --workspace @json-form/form-protocol && npm run build --workspace @json-form/renderer-antdv && npm run build --workspace @json-form/form-kit && npm run build --workspace @json-form/demo",
-    "preview": "npm run preview --workspace @json-form/demo"
+    "dev": "npm run dev --workspace @sailornpg/demo",
+    "build": "npm run build --workspace @sailornpg/engine-adapter && npm run build --workspace @sailornpg/form-protocol && npm run build --workspace @sailornpg/renderer-antdv && npm run build --workspace @sailornpg/form-kit && npm run build --workspace @sailornpg/demo",
+    "preview": "npm run preview --workspace @sailornpg/demo",
+    "publish:preflight": "node ./scripts/publish-preflight.mjs",
+    "publish:preflight:low-level": "node ./scripts/publish-preflight.mjs --profile low-level",
+    "publish:preflight:business-path": "node ./scripts/publish-preflight.mjs --profile business-path"
   },
   "devDependencies": {
     "@types/node": "^24.12.2",

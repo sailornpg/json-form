@@ -5,12 +5,12 @@ import {
   type JsonFormsRendererRegistryEntry,
   type JsonSchema,
   type UISchemaElement,
-} from '@json-form/engine-adapter'
-import { antdvCells, antdvRenderers } from '@json-form/renderer-antdv'
+} from '@sailornpg/engine-adapter'
+import { antdvCells, antdvRenderers } from '@sailornpg/renderer-antdv'
 import {
   registerSchemaFormWidgets,
   unregisterSchemaFormWidgets,
-} from '@json-form/form-protocol'
+} from '@sailornpg/form-protocol'
 import {
   computed,
   defineComponent,

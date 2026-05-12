@@ -1,6 +1,6 @@
-# @json-form/form-kit
+# @sailornpg/form-kit
 
-`@json-form/form-kit` 是当前仓库面向业务接入方的主入口。
+`@sailornpg/form-kit` 是当前仓库面向业务接入方的主入口。
 
 它提供：
 
@@ -15,15 +15,15 @@
 ## 安装
 
 ```bash
-npm install @json-form/form-kit @json-form/renderer-antdv vue ant-design-vue
+npm install @sailornpg/form-kit @sailornpg/renderer-antdv vue ant-design-vue
 ```
 
 ## 推荐接法
 
 ```vue
 <script setup lang="ts">
-import { SchemaForm } from '@json-form/form-kit'
-import { antdvPreset } from '@json-form/renderer-antdv'
+import { SchemaForm } from '@sailornpg/form-kit'
+import { antdvPreset } from '@sailornpg/renderer-antdv'
 </script>
 
 <template>
@@ -38,4 +38,4 @@ import { antdvPreset } from '@json-form/renderer-antdv'
 
 ## 说明
 
-当前版本仍以内置的 Ant Design Vue renderer 作为默认消费路径，因此推荐与 `@json-form/renderer-antdv` 搭配使用。
+当前版本仍以内置的 Ant Design Vue renderer 作为默认消费路径，因此推荐与 `@sailornpg/renderer-antdv` 搭配使用。

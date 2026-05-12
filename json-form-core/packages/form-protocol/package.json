@@ -1,5 +1,5 @@
 {
-  "name": "@json-form/form-protocol",
+  "name": "@sailornpg/form-protocol",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -23,6 +23,6 @@
     "vue": "^3.5.32"
   },
   "dependencies": {
-    "@json-form/engine-adapter": "^0.1.0"
+    "@sailornpg/engine-adapter": "^0.1.0"
   }
 }

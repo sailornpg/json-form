@@ -1,5 +1,5 @@
 {
-  "name": "@json-form/form-kit",
+  "name": "@sailornpg/form-kit",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -24,8 +24,8 @@
     "vue": "^3.5.32"
   },
   "dependencies": {
-    "@json-form/engine-adapter": "^0.1.0",
-    "@json-form/form-protocol": "^0.1.0",
-    "@json-form/renderer-antdv": "^0.1.0"
+    "@sailornpg/engine-adapter": "^0.1.0",
+    "@sailornpg/form-protocol": "^0.1.0",
+    "@sailornpg/renderer-antdv": "^0.1.0"
   }
 }

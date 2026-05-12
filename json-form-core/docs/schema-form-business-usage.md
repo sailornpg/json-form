@@ -32,8 +32,8 @@
 
 ```vue
 <script setup lang="ts">
-import { SchemaForm } from '@json-form/form-kit'
-import { antdvPreset } from '@json-form/renderer-antdv'
+import { SchemaForm } from '@sailornpg/form-kit'
+import { antdvPreset } from '@sailornpg/renderer-antdv'
 </script>
 
 <template>
@@ -194,7 +194,7 @@ const emit = defineEmits<{
 ### 注册 Widget
 
 ```ts
-import { defineSchemaFormWidget, type SchemaFormWidgetMap } from '@json-form/form-kit'
+import { defineSchemaFormWidget, type SchemaFormWidgetMap } from '@sailornpg/form-kit'
 import MoneyInput from './components/MoneyInput.vue'
 
 const widgets: SchemaFormWidgetMap = {

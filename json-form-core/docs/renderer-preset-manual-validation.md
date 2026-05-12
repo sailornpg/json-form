@@ -14,7 +14,7 @@
 
 - 仓库：`json-form-core`
 - 页面：`apps/demo`
-- 本地命令：`npm run dev --workspace @json-form/demo -- --host localhost --port 5199`
+- 本地命令：`npm run dev --workspace @sailornpg/demo -- --host localhost --port 5199`
 - 构建命令：`npm run build`
 
 ## 构建验证

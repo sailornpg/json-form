@@ -13,7 +13,7 @@
 ### 2.1 设计目标
 
 - 对业务侧暴露简单稳定的 `SchemaForm` API。
-- 让业务侧主要使用 `@json-form/form-kit`，而不是直接依赖 `@jsonforms/vue`。
+- 让业务侧主要使用 `@sailornpg/form-kit`，而不是直接依赖 `@jsonforms/vue`。
 - 将底层 JSON Forms 的集成细节限制在 `engine-adapter` 和 `form-kit` 内部。
 - 将 UI 库绑定限制在 `renderer-antdv`，避免 `ant-design-vue` 泄漏到引擎层。
 - 支持标准 JSON Schema 校验、UI Schema 布局、字段运行时状态、业务校验、联动 effects 和异步 options。

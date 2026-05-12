@@ -1,1 +1,1 @@
-export { defineSchemaFormWidget } from '@json-form/form-protocol'
+export { defineSchemaFormWidget } from '@sailornpg/form-protocol'

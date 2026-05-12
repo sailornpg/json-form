@@ -1,5 +1,5 @@
-import type { ErrorObject, JsonSchema, UISchemaElement } from '@json-form/engine-adapter'
-import type { SchemaFormOption } from '@json-form/form-protocol'
+import type { ErrorObject, JsonSchema, UISchemaElement } from '@sailornpg/engine-adapter'
+import type { SchemaFormOption } from '@sailornpg/form-protocol'
 
 export type {
   SchemaFormOption,
@@ -8,7 +8,7 @@ export type {
   SchemaFormWidgetMap,
   SchemaFormWidgetProps,
   ValidationDisplayMode,
-} from '@json-form/form-protocol'
+} from '@sailornpg/form-protocol'
 
 export type SchemaFormData = Record<string, unknown> | unknown[]
 
